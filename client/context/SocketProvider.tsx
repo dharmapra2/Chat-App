@@ -43,7 +43,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     const _socket = io(`${process.env.NEXT_PUBLIC_SERVER_HOST}`);
     _socket.on("message", onMessageRec);
-
     setSocket(_socket);
 
     return () => {

@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import AuthRoutes from "./Routes/AuthRoutes.js";
 import connectMongodb from "./Config/connection.js";
+import SocketService from "./Services/Socket.js";
+import { createServer } from "http";
 
 dotenv.config();
 /* declearing port */
@@ -12,11 +14,14 @@ const PORT = process.env.HOST_PORT || 4000;
 (async () => {
   const app: Express = express();
 
+  const httpServer = createServer(app);
+
   mongoose.set("strictQuery", true);
   // Allow requests from client-side http://localhost:3000
   app.use(
     cors({
       origin: "*",
+      credentials: true, // Allow sending cookies along with the requests
     })
   );
 
@@ -26,6 +31,10 @@ const PORT = process.env.HOST_PORT || 4000;
 
   /* connecting to mongodb */
   await connectMongodb();
+
+  // Socket
+  const socketService = new SocketService();
+  socketService.io.attach(httpServer);
 
   app.get("/hi", (req, res) => {
     res.json({ msg: "hi" });
@@ -44,7 +53,9 @@ const PORT = process.env.HOST_PORT || 4000;
       message: err?.message || "Internal Server Error",
     });
   });
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log("port is running", PORT);
   });
+
+  socketService.initListeners();
 })();
