@@ -22,7 +22,7 @@ export default function Page() {
           Send Message
         </button>
       </div>
-      <div className="flex justify-between w-full h-full">
+      <div className="flex flex-col justify-between w-full h-full">
         {messages.map((e, index) => (
           <li key={index}>{e}</li>
         ))}

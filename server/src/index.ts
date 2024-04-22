@@ -7,11 +7,11 @@ import connectMongodb from "./Config/connection.js";
 import SocketService from "./Services/Socket.js";
 import { createServer } from "http";
 
-dotenv.config();
-/* declearing port */
-const PORT = process.env.HOST_PORT || 4000;
-
 (async () => {
+  dotenv.config();
+
+  /* declearing port */
+  const PORT = process.env.HOST_PORT || 4000;
   const app: Express = express();
 
   const httpServer = createServer(app);

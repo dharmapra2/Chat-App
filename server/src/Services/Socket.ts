@@ -1,6 +1,10 @@
+import { Redis } from "ioredis";
 import { Server } from "socket.io";
+
 class SocketService {
   private _io: Server;
+  private pub: Redis;
+  private sub: Redis;
   constructor() {
     this._io = new Server({
       cors: {
@@ -9,6 +13,16 @@ class SocketService {
       },
     });
     console.log(`Init Socket Service...`);
+    const redisOptions = {
+      host: process.env.REDIS_HOST || "localhost",
+      port: parseInt(process.env.REDIS_PORT || "6379"),
+      username: process.env.REDIS_USER_NAME || "",
+      password: process.env.REDIS_USER_PASSWORD || "",
+    };
+    this.pub = new Redis(redisOptions);
+    this.sub = new Redis(redisOptions);
+
+    this.sub.subscribe("MESSAGES");
   }
 
   get io() {
@@ -22,7 +36,14 @@ class SocketService {
 
       socket.on("event:message", async ({ message }: { message: String }) => {
         console.log(`New message rec.:-`, message);
+        await this.pub.publish("MESSAGES", JSON.stringify({ message }));
       });
+    }); 
+
+    this.sub.on("message", (channel, message) => {
+      if (channel === "MESSAGES") {
+        io.emit("message", message);
+      }
     });
   }
 }
