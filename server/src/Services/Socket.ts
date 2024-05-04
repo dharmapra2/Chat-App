@@ -8,8 +8,8 @@ class SocketService {
   constructor() {
     this._io = new Server({
       cors: {
-        allowedHeaders: ["*"],
         origin: "*",
+        allowedHeaders: ["*"],
       },
     });
     console.log(`Init Socket Service...`);
@@ -38,7 +38,7 @@ class SocketService {
         console.log(`New message rec.:-`, message);
         await this.pub.publish("MESSAGES", JSON.stringify({ message }));
       });
-    }); 
+    });
 
     this.sub.on("message", (channel, message) => {
       if (channel === "MESSAGES") {
