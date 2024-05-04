@@ -1,32 +1,16 @@
-"use client";
-import { useState } from "react";
-import { useSocket } from "../context/SocketProvider";
+import LeftPanel from "@/components/left-panel";
+import RightPanel from "@/components/right-panel";
 
-export default function Page() {
-  const { sendMessage, messages } = useSocket();
-  // const messages = ["Asdsfs"];
-  const [message, setMessage] = useState("");
-
+export default function Home() {
+  console.log("hiiii");
   return (
-    <div className="mx-auto flex bg-slate-500 flex-col items-center w-full h-full text-black">
-      <div className="flex justify-between w-full h-20 p-2">
-        <input
-          onChange={(e) => setMessage(e.target.value)}
-          className="w-52 h-14 p-3 border-2 rounded-lg"
-          placeholder="Message..."
-        />
-        <button
-          onClick={(e) => sendMessage(message)}
-          className="h-14 w-fit p-3 rounded-lg bg-slate-100"
-        >
-          Send Message
-        </button>
-      </div>
-      <div className="flex flex-col justify-between w-full h-full">
-        {messages.map((e, index) => (
-          <li key={index}>{e}</li>
-        ))}
-      </div>
-    </div>
+    <main className="m-5">
+      <section className="flex overflow-y-hidden h-[calc(100vh-50px)] max-w-[1700px] mx-auto bg-left-panel">
+        {/* Green background decorator for Light Mode */}
+        <div className="fixed top-0 left-0 w-full h-36 bg-green-primary dark:bg-transparent -z-30" />
+        <LeftPanel />
+        <RightPanel />
+      </section>
+    </main>
   );
 }
