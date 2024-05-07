@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import {
   ListFilter,
   LogOut,
@@ -7,19 +8,20 @@ import {
 } from "lucide-react";
 import ThemeSwitch from "./ThemeSwitcher";
 import { Input } from "./ui/input";
+import { conversations } from "@/dummyData/db";
+
+const ConversationComponent = React.lazy(() => import("./conversation"));
 
 const LeftPanel = () => {
-  const conversations = [];
-
   return (
     <aside className="w-1/4 border-gray-600 border-r">
       <nav className="sticky top-0 bg-left-panel z-10">
         {/* Header */}
         <div className="flex justify-between bg-gray-primary p-3 items-center">
-          <User size={24} />
+          <User size={24} className="cursor-pointer" />
 
           <div className="flex items-center gap-3">
-            <MessageSquareDiff size={20} />{" "}
+            <MessageSquareDiff size={20} />
             {/* TODO: This line will be replaced with <UserListDialog /> */}
             <ThemeSwitch />
             <LogOut size={20} className="cursor-pointer" />
@@ -45,8 +47,7 @@ const LeftPanel = () => {
       {/* Chat List */}
       <section className="my-3 flex flex-col gap-0 max-h-[80%] overflow-auto">
         {/* Conversations will go here*/}
-
-        {conversations?.length === 0 && (
+        {conversations?.length === 0 ? (
           <>
             <p className="text-center text-gray-500 text-sm mt-3">
               No conversations yet
@@ -56,9 +57,21 @@ const LeftPanel = () => {
               somewhere 😊
             </p>
           </>
+        ) : (
+          // Chat List
+          conversations?.map((conversation) => (
+            // eslint-disable-next-line react/jsx-key
+            <Suspense fallback={<div>Loading....</div>}>
+              <ConversationComponent
+                key={conversation?._id}
+                conversation={conversation}
+              />
+            </Suspense>
+          ))
         )}
       </section>
     </aside>
   );
 };
+
 export default LeftPanel;
