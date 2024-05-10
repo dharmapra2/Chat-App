@@ -6,11 +6,17 @@ import {
   Search,
   User,
 } from "lucide-react";
-import ThemeSwitch from "./ThemeSwitcher";
-import { Input } from "./ui/input";
+import ThemeSwitch from "@/components/ThemeSwitcher";
+import { Input } from "@/components/ui/input";
 import { conversations } from "@/dummyData/db";
+import dynamic from "next/dynamic";
 
-const ConversationComponent = React.lazy(() => import("./conversation"));
+const ConversationComponent = dynamic(
+  () => import("@/components/conversation"),
+  {
+    loading: () => <p>Loading...</p>,
+  }
+);
 
 const LeftPanel = () => {
   return (
@@ -60,13 +66,10 @@ const LeftPanel = () => {
         ) : (
           // Chat List
           conversations?.map((conversation) => (
-            // eslint-disable-next-line react/jsx-key
-            <Suspense fallback={<div>Loading....</div>}>
-              <ConversationComponent
-                key={conversation?._id}
-                conversation={conversation}
-              />
-            </Suspense>
+            <ConversationComponent
+              key={conversation?._id}
+              conversation={conversation}
+            />
           ))
         )}
       </section>

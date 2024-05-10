@@ -1,4 +1,3 @@
-"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Video, X } from "lucide-react";
 import ChatPlaceHolder from "@/components/home/chat-placeholder";
