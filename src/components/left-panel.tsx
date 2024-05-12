@@ -1,15 +1,10 @@
 import React, { Suspense } from "react";
-import {
-  ListFilter,
-  LogOut,
-  MessageSquareDiff,
-  Search,
-  User,
-} from "lucide-react";
+import { ListFilter, MessageSquareDiff, Search } from "lucide-react";
 import ThemeSwitch from "@/src/components/ThemeSwitcher";
 import { Input } from "@/src/components/ui/input";
 import { conversations } from "@/src/dummyData/db";
 import dynamic from "next/dynamic";
+import { UserButton } from "@clerk/nextjs";
 
 const ConversationComponent = dynamic(
   () => import("@/src/components/conversation"),
@@ -24,13 +19,13 @@ const LeftPanel = () => {
       <nav className="sticky top-0 bg-left-panel z-10">
         {/* Header */}
         <div className="flex justify-between bg-gray-primary p-3 items-center">
-          <User size={24} className="cursor-pointer" />
-
+          <div className="flex">
+            <UserButton />
+          </div>
           <div className="flex items-center gap-3">
             <MessageSquareDiff size={20} />
             {/* TODO: This line will be replaced with <UserListDialog /> */}
             <ThemeSwitch />
-            <LogOut size={20} className="cursor-pointer" />
           </div>
         </div>
         <div className="p-3 flex items-center">

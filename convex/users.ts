@@ -6,6 +6,7 @@ export const createUser = internalMutation({
     tokenIdentifier: v.string(),
     email: v.string(),
     name: v.string(),
+    phoneNumber: v.any(),
     image: v.string(),
   },
   handler: async (ctx, args) => {
@@ -15,6 +16,7 @@ export const createUser = internalMutation({
       name: args.name,
       image: args.image,
       isOnline: true,
+      phoneNumber: args.phoneNumber ?? null,
     });
   },
 });
