@@ -1,4 +1,4 @@
-export default {
+const authclerkConfig = {
   providers: [
     {
       domain: process.env.CLERK_ISSUER_URL,
@@ -6,3 +6,5 @@ export default {
     },
   ],
 };
+
+export default authclerkConfig;

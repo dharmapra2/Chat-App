@@ -5,7 +5,6 @@ export default defineSchema({
   users: defineTable({
     name: v.optional(v.string()),
     email: v.string(),
-    phoneNumber: v.optional(v.string()),
     image: v.string(),
     tokenIdentifier: v.string(),
     isOnline: v.boolean(),

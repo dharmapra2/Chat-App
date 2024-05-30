@@ -6,7 +6,6 @@ export const createUser = internalMutation({
     tokenIdentifier: v.string(),
     email: v.string(),
     name: v.string(),
-    phoneNumber: v.any(),
     image: v.string(),
   },
   handler: async (ctx, args) => {
@@ -16,13 +15,12 @@ export const createUser = internalMutation({
       name: args.name,
       image: args.image,
       isOnline: true,
-      phoneNumber: args.phoneNumber ?? null,
     });
   },
 });
 
 export const updateUser = internalMutation({
-  args: { tokenIdentifier: v.string(), image: v.string() },
+  args: { tokenIdentifier: v.string(), image: v.string(), name: v.string() },
   async handler(ctx, args) {
     const user = await ctx.db
       .query("users")
@@ -37,6 +35,7 @@ export const updateUser = internalMutation({
 
     await ctx.db.patch(user._id, {
       image: args.image,
+      name: args.name,
     });
   },
 });

@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { ListFilter, MessageSquareDiff, Search } from "lucide-react";
 import ThemeSwitch from "@/src/components/ThemeSwitcher";
 import { Input } from "@/src/components/ui/input";
