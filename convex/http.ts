@@ -38,13 +38,15 @@ http.route({
           });
           break;
         case "session.created":
-          await ctx.runMutation(internal.users.setUserOnline, {
+          await ctx.runMutation(internal.users.setUserOnlineOffline, {
             tokenIdentifier: `${process.env.CLERK_APP_DOMAIN}|${result.data.user_id}`,
+            isOnline: true,
           });
           break;
         case "session.ended":
-          await ctx.runMutation(internal.users.setUserOffline, {
+          await ctx.runMutation(internal.users.setUserOnlineOffline, {
             tokenIdentifier: `${process.env.CLERK_APP_DOMAIN}|${result.data.user_id}`,
+            isOnline: false,
           });
           break;
       }

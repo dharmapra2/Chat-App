@@ -5,6 +5,7 @@ import { Input } from "@/src/components/ui/input";
 import { conversations } from "@/src/dummyData/db";
 import dynamic from "next/dynamic";
 import { UserButton } from "@clerk/nextjs";
+import UserListDialog from "@/src/components/home/user-list-dialog";
 
 const ConversationComponent = dynamic(
   () => import("@/src/components/conversation"),
@@ -23,7 +24,8 @@ const LeftPanel = () => {
             <UserButton />
           </div>
           <div className="flex items-center gap-3">
-            <MessageSquareDiff size={20} />
+            {/* <MessageSquareDiff size={20} /> */}
+            <UserListDialog />
             {/* TODO: This line will be replaced with <UserListDialog /> */}
             <ThemeSwitch />
           </div>
