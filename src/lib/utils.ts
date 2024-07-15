@@ -54,10 +54,10 @@ export function formatDate(date_ms: number) {
 
   // If none of the above conditions match, return in a different format
   return (
+    provided_date.getDate() +
+    "/" +
     provided_date.getMonth() +
     1 +
-    "/" +
-    provided_date.getDate() +
     "/" +
     provided_date.getFullYear()
   );

@@ -13,9 +13,10 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/src/components/ui/dialog";
-import { users } from "@/src/dummyData/db";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const UserListDialog = () => {
   const [selectedUsers, setSelectedUsers] = useState<Id<"users">[]>([]);
@@ -23,13 +24,46 @@ const UserListDialog = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [renderedImage, setRenderedImage] = useState("");
+
   const imgRef = useRef<HTMLInputElement>(null);
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (!selectedImage) return setRenderedImage("");
     const reader = new FileReader();
     reader.onload = (e) => setRenderedImage(e.target?.result as string);
     reader.readAsDataURL(selectedImage);
   }, [selectedImage]);
+
+  const createConversation = useMutation(api.conversations.createConversation);
+  const me = useQuery(api.users.getMe);
+  const users = useQuery(api.users.getUsers);
+
+  console.log(`users: `, users);
+
+  const handleCreateConversations = async () => {
+    if (selectedUsers.length == 0) return;
+    try {
+      console.log(isLoading);
+      setIsLoading((_prev) => true);
+      const isGroup = selectedUsers.length > 1;
+      let conversationId = null;
+      if (!isGroup) {
+        conversationId = await createConversation({
+          participants: [...selectedUsers, me?._id!],
+          isGroup: false,
+        });
+      } else {
+      }
+      dialogCloseRef.current?.click();
+      setSelectedUsers((_prev) => []);
+      setGroupName((_prev) => "");
+    } catch (error) {
+      console.log(`error :${error}`);
+    } finally {
+      setIsLoading((_prev) => false);
+    }
+  };
 
   return (
     <Dialog>
@@ -39,7 +73,7 @@ const UserListDialog = () => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>USERS</DialogTitle>
-          <DialogClose />
+          <DialogClose ref={dialogCloseRef} />
         </DialogHeader>
 
         <DialogDescription>Start a new chat</DialogDescription>
@@ -67,7 +101,7 @@ const UserListDialog = () => {
             <Input
               placeholder="Group Name"
               value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
+              onChange={(e) => setGroupName((_prev) => e.target.value)}
             />
             <Button
               className="flex gap-2"
@@ -127,10 +161,11 @@ const UserListDialog = () => {
               (selectedUsers.length > 1 && !groupName) ||
               isLoading
             }
+            onClick={handleCreateConversations}
           >
             {/* spinner */}
             {isLoading ? (
-              <div className="w-5 h-5 border-t-2 border-b-2  rounded-full animate-spin" />
+              <div className="w-5 h-5 border-t-2 border-b-2 rounded-full animate-spin" />
             ) : (
               "Create"
             )}
