@@ -24,6 +24,7 @@ const Conversation = ({ conversation }: { conversation: any }) => {
             <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground" />
           )}
           <AvatarImage
+            loading="lazy"
             src={conversationImage || "/placeholder.png"}
             className="object-cover rounded-full"
           />

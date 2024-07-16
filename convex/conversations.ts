@@ -29,7 +29,7 @@ export const createConversation = mutation({
 
     let groupImage;
     if (args.groupImage) {
-      // Todo upload group image later
+      groupImage = (await ctx.storage.getUrl(args.groupImage)) as string;
     }
     const conversationId = await ctx.db.insert("conversations", {
       participants: args.participants,
@@ -40,4 +40,9 @@ export const createConversation = mutation({
     });
     return conversationId;
   },
+});
+
+export const generateUploadUrl = mutation(async (ctx) => {
+  // A url that allows file upload via an HTTP POST
+  return await ctx.storage.generateUploadUrl();
 });

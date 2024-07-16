@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { ImageIcon, MessageSquareDiff } from "lucide-react";
@@ -36,6 +37,7 @@ const UserListDialog = () => {
   }, [selectedImage]);
 
   const createConversation = useMutation(api.conversations.createConversation);
+  const generateUploadUrl = useMutation(api.conversations.generateUploadUrl);
   const me = useQuery(api.users.getMe);
   const users = useQuery(api.users.getUsers);
 
@@ -54,12 +56,32 @@ const UserListDialog = () => {
           isGroup: false,
         });
       } else {
+        // Step 1: Get a short-lived upload URL
+        const postUrl = await generateUploadUrl();
+        // Step 2: POST the file to the URL
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": selectedImage!.type },
+          body: selectedImage,
+        });
+        const { storageId } = await result.json();
+        conversationId = await createConversation({
+          participants: [...selectedUsers, me?._id!],
+          isGroup: true,
+          groupImage: storageId,
+          groupName,
+          admin: me?._id,
+        });
       }
       dialogCloseRef.current?.click();
       setSelectedUsers((_prev) => []);
       setGroupName((_prev) => "");
+      setSelectedImage((_prev) => null);
+
+      // TodO=> update the global state called `selectedConversations`.
     } catch (error) {
-      console.log(`error :${error}`);
+      console.error(`error :${error}`);
+      toast.error("Failed to create conversations.");
     } finally {
       setIsLoading((_prev) => false);
     }
@@ -82,6 +104,7 @@ const UserListDialog = () => {
             <Image
               src={renderedImage}
               fill
+              loading="lazy"
               alt="user image"
               className="rounded-full object-cover"
             />
@@ -136,6 +159,7 @@ const UserListDialog = () => {
 
                 <AvatarImage
                   src={user.image}
+                  loading="lazy"
                   className="rounded-full object-cover"
                 />
                 <AvatarFallback>
