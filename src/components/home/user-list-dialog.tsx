@@ -16,10 +16,18 @@ import {
 } from "@/src/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Id } from "@/convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-const UserListDialog = () => {
+interface ConversationParams {
+  participants: Id<"users">[];
+  isGroup: boolean;
+  groupName: string;
+  admin: Id<"users"> | undefined;
+  groupImage?: Id<"_storage">;
+}
+
+const UserListDialogContent = () => {
   const [selectedUsers, setSelectedUsers] = useState<Id<"users">[]>([]);
   const [groupName, setGroupName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,162 +49,176 @@ const UserListDialog = () => {
   const me = useQuery(api.users.getMe);
   const users = useQuery(api.users.getUsers);
 
-  console.log(`users: `, users);
-
   const handleCreateConversations = async () => {
-    if (selectedUsers.length == 0) return;
+    if (selectedUsers.length === 0) return;
     try {
-      console.log(isLoading);
-      setIsLoading((_prev) => true);
+      setIsLoading(true);
       const isGroup = selectedUsers.length > 1;
-      let conversationId = null;
       if (!isGroup) {
-        conversationId = await createConversation({
+        const { ConversationId, messages, status } = await createConversation({
           participants: [...selectedUsers, me?._id!],
           isGroup: false,
         });
+        status != "exits" ? toast.success(messages) : toast.error(messages);
       } else {
-        // Step 1: Get a short-lived upload URL
-        const postUrl = await generateUploadUrl();
-        // Step 2: POST the file to the URL
-        const result = await fetch(postUrl, {
-          method: "POST",
-          headers: { "Content-Type": selectedImage!.type },
-          body: selectedImage,
-        });
-        const { storageId } = await result.json();
-        conversationId = await createConversation({
-          participants: [...selectedUsers, me?._id!],
+        let temp_storageId: ConversationParams = {
+          participants: [...selectedUsers, me?._id!].sort(),
           isGroup: true,
-          groupImage: storageId,
           groupName,
           admin: me?._id,
-        });
+        };
+        if (selectedImage) {
+          // Step 1: Get a short-lived upload URL
+          const postUrl = await generateUploadUrl();
+          // Step 2: POST the file to the URL
+          const result = await fetch(postUrl, {
+            method: "POST",
+            headers: { "Content-Type": selectedImage!.type },
+            body: selectedImage,
+          });
+          const { storageId } = await result.json();
+          temp_storageId.groupImage = storageId as Id<"_storage">;
+        }
+        const { ConversationId, messages, status } =
+          await createConversation(temp_storageId);
+        status != "exits" ? toast.success(messages) : toast.error(messages);
       }
       dialogCloseRef.current?.click();
-      setSelectedUsers((_prev) => []);
-      setGroupName((_prev) => "");
-      setSelectedImage((_prev) => null);
+      setSelectedUsers([]);
+      setGroupName("");
+      setSelectedImage(null);
 
-      // TodO=> update the global state called `selectedConversations`.
+      // TODO: update the global state called `selectedConversations`.
     } catch (error) {
-      console.error(`error :${error}`);
+      console.error(`Error: ${error}`);
       toast.error("Failed to create conversations.");
     } finally {
-      setIsLoading((_prev) => false);
+      setIsLoading(false);
     }
   };
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>USERS</DialogTitle>
+        <DialogClose ref={dialogCloseRef} />
+      </DialogHeader>
+      <DialogDescription>Start a new chat</DialogDescription>
+      {renderedImage && (
+        <div className="w-16 h-16 relative mx-auto">
+          <Image
+            src={renderedImage}
+            fill
+            loading="lazy"
+            alt="user image"
+            className="rounded-full object-cover"
+          />
+        </div>
+      )}
+      <input
+        type="file"
+        name="selected_image"
+        accept="image/*"
+        ref={imgRef}
+        hidden
+        onChange={(e) => setSelectedImage(e.target.files![0])}
+      />
+      {selectedUsers.length > 1 && (
+        <>
+          <Input
+            placeholder="Group Name"
+            value={groupName}
+            onChange={(e) => setGroupName(e.target.value)}
+          />
+          <Button
+            className="flex gap-2"
+            onClick={() => imgRef.current?.click()}
+          >
+            <ImageIcon size={20} />
+            Group Image
+          </Button>
+        </>
+      )}
+      <div className="flex flex-col gap-3 overflow-auto max-h-60">
+        {users?.map((user) => (
+          <div
+            key={user._id}
+            className={`flex gap-3 items-center p-2 rounded cursor-pointer active:scale-95 
+                transition-all ease-in-out duration-300 ${
+                  selectedUsers.includes(user._id) ? "bg-green-primary" : ""
+                }`}
+            onClick={() => {
+              setSelectedUsers((prevSelectedUsers) =>
+                prevSelectedUsers.includes(user._id)
+                  ? prevSelectedUsers.filter((id) => id !== user._id)
+                  : [...prevSelectedUsers, user._id]
+              );
+            }}
+          >
+            <Avatar className="overflow-visible">
+              {user.isOnline && (
+                <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground" />
+              )}
+              <AvatarImage
+                src={user.image}
+                loading="lazy"
+                className="rounded-full object-cover"
+              />
+              <AvatarFallback>
+                <div className="animate-pulse bg-gray-tertiary w-full h-full rounded-full"></div>
+              </AvatarFallback>
+            </Avatar>
+            <div className="w-full">
+              <div className="flex items-center justify-between">
+                <p className="text-md font-medium">
+                  {user.name || user.email.split("@")[0]}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between">
+        <Button
+          variant={"outline"}
+          onClick={() => dialogCloseRef.current?.click()}
+        >
+          Cancel
+        </Button>
+        <Button
+          disabled={
+            selectedUsers.length === 0 ||
+            (selectedUsers.length > 1 && !groupName) ||
+            isLoading
+          }
+          onClick={handleCreateConversations}
+        >
+          {isLoading ? (
+            <div className="w-5 h-5 border-t-2 border-b-2 rounded-full animate-spin" />
+          ) : (
+            "Create"
+          )}
+        </Button>
+      </div>
+    </DialogContent>
+  );
+};
+
+const UserListDialog = () => {
+  const { isAuthenticated } = useConvexAuth();
+
+  if (!isAuthenticated) {
+    return <MessageSquareDiff size={20} />;
+  }
 
   return (
     <Dialog>
       <DialogTrigger>
         <MessageSquareDiff size={20} />
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>USERS</DialogTitle>
-          <DialogClose ref={dialogCloseRef} />
-        </DialogHeader>
-
-        <DialogDescription>Start a new chat</DialogDescription>
-        {renderedImage && (
-          <div className="w-16 h-16 relative mx-auto">
-            <Image
-              src={renderedImage}
-              fill
-              loading="lazy"
-              alt="user image"
-              className="rounded-full object-cover"
-            />
-          </div>
-        )}
-        {/* TODO: input file */}
-        <input
-          type="file"
-          name="selected_image"
-          accept="image/*"
-          ref={imgRef}
-          hidden
-          onChange={(e) => setSelectedImage(e.target.files![0])}
-        />
-        {selectedUsers.length > 1 && (
-          <>
-            <Input
-              placeholder="Group Name"
-              value={groupName}
-              onChange={(e) => setGroupName((_prev) => e.target.value)}
-            />
-            <Button
-              className="flex gap-2"
-              onClick={() => imgRef.current?.click()}
-            >
-              <ImageIcon size={20} />
-              Group Image
-            </Button>
-          </>
-        )}
-        <div className="flex flex-col gap-3 overflow-auto max-h-60">
-          {users?.map((user) => (
-            <div
-              key={user._id}
-              className={`flex gap-3 items-center p-2 rounded cursor-pointer active:scale-95 
-								transition-all ease-in-out duration-300
-							${selectedUsers.includes(user._id) ? "bg-green-primary" : ""}`}
-              onClick={() => {
-                if (selectedUsers.includes(user._id)) {
-                  setSelectedUsers(
-                    selectedUsers.filter((id) => id !== user._id)
-                  );
-                } else {
-                  setSelectedUsers([...selectedUsers, user._id]);
-                }
-              }}
-            >
-              <Avatar className="overflow-visible">
-                {user.isOnline && (
-                  <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-foreground" />
-                )}
-
-                <AvatarImage
-                  src={user.image}
-                  loading="lazy"
-                  className="rounded-full object-cover"
-                />
-                <AvatarFallback>
-                  <div className="animate-pulse bg-gray-tertiary w-full h-full rounded-full"></div>
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="w-full ">
-                <div className="flex items-center justify-between">
-                  <p className="text-md font-medium">
-                    {user.name || user.email.split("@")[0]}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between">
-          <Button variant={"outline"}>Cancel</Button>
-          <Button
-            disabled={
-              selectedUsers.length === 0 ||
-              (selectedUsers.length > 1 && !groupName) ||
-              isLoading
-            }
-            onClick={handleCreateConversations}
-          >
-            {/* spinner */}
-            {isLoading ? (
-              <div className="w-5 h-5 border-t-2 border-b-2 rounded-full animate-spin" />
-            ) : (
-              "Create"
-            )}
-          </Button>
-        </div>
-      </DialogContent>
+      <UserListDialogContent />
     </Dialog>
   );
 };
+
 export default UserListDialog;

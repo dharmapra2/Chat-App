@@ -1,12 +1,10 @@
-"use client";
 import React from "react";
-import { ListFilter, MessageSquareDiff, Search } from "lucide-react";
+import { ListFilter, Search } from "lucide-react";
 import ThemeSwitch from "@/src/components/ThemeSwitcher";
 import { Input } from "@/src/components/ui/input";
 import { conversations } from "@/src/dummyData/db";
 import dynamic from "next/dynamic";
 import { UserButton } from "@clerk/nextjs";
-import { useConvexAuth } from "convex/react";
 
 const ConversationComponent = dynamic(
   () => import("@/src/components/conversation"),
@@ -23,7 +21,6 @@ const UserListDialog = dynamic(
 );
 
 const LeftPanel = () => {
-  const { isLoading, isAuthenticated } = useConvexAuth();
   return (
     <aside className="w-1/4 border-gray-600 border-r">
       <nav className="sticky top-0 bg-left-panel z-10">
@@ -33,11 +30,7 @@ const LeftPanel = () => {
             <UserButton />
           </div>
           <div className="flex items-center gap-3">
-            {isAuthenticated ? (
-              <UserListDialog />
-            ) : (
-              <MessageSquareDiff size={20} />
-            )}
+            <UserListDialog />
             <ThemeSwitch />
           </div>
         </div>

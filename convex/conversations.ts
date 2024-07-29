@@ -24,7 +24,11 @@ export const createConversation = mutation({
       .first();
     console.log(`existingConversion: `, existingConversion);
     if (existingConversion) {
-      return existingConversion._id;
+      return {
+        ConversationId: existingConversion._id,
+        messages: "Conversations is alredy exits.",
+        status: "exits",
+      };
     }
 
     let groupImage;
@@ -38,7 +42,11 @@ export const createConversation = mutation({
       groupImage,
       admin: args.admin,
     });
-    return conversationId;
+    return {
+      ConversationId: conversationId,
+      messages: "Conversations is created sucessfully.",
+      status: "new",
+    };
   },
 });
 
