@@ -1,5 +1,6 @@
+import { conversations } from "./../src/dummyData/db";
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const createConversation = mutation({
   args: {
@@ -53,4 +54,59 @@ export const createConversation = mutation({
 export const generateUploadUrl = mutation(async (ctx) => {
   // A url that allows file upload via an HTTP POST
   return await ctx.storage.generateUploadUrl();
+});
+
+export const getMyConversations = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_tokenIdentifier", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
+
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+
+    const conversations = await ctx.db.query("conversations").collect();
+
+    const myConversations = conversations.filter((records) =>
+      records.participants.includes(user?._id)
+    );
+
+    const conversationsWithDetails = await Promise.all(
+      myConversations.map(async (conversations) => {
+        let userDeatils = {};
+        if (!conversations.isGroup) {
+          const otherUserId = conversations.participants.find(
+            (id) => id !== user._id
+          );
+          const userProfile = await ctx.db
+            .query("users")
+            .filter((q) => q.eq(q.field("_id"), otherUserId))
+            .take(1);
+
+          userDeatils = userProfile[0];
+        }
+        const lastMessage = await ctx.db
+          .query("messages")
+          .filter((q) => q.eq(q.field("conversation"), conversations._id))
+          .order("desc")
+          .take(1);
+        return {
+          ...userDeatils,
+          ...conversations,
+          lastMessage: lastMessage[0] || null,
+        };
+      })
+    );
+    return conversationsWithDetails;
+  },
 });

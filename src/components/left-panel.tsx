@@ -2,12 +2,11 @@ import React from "react";
 import { ListFilter, Search } from "lucide-react";
 import ThemeSwitch from "@/src/components/ThemeSwitcher";
 import { Input } from "@/src/components/ui/input";
-import { conversations } from "@/src/dummyData/db";
 import dynamic from "next/dynamic";
 import { UserButton } from "@clerk/nextjs";
 
 const ConversationComponent = dynamic(
-  () => import("@/src/components/conversation"),
+  () => import("@/src/components/home/ParentConversation"),
   {
     loading: () => <p>Loading...</p>,
   }
@@ -52,28 +51,7 @@ const LeftPanel = () => {
       </nav>
 
       {/* Chat List */}
-      <section className="my-3 flex flex-col gap-0 max-h-[80%] overflow-auto">
-        {/* Conversations will go here*/}
-        {conversations?.length === 0 ? (
-          <>
-            <p className="text-center text-gray-500 text-sm mt-3">
-              No conversations yet
-            </p>
-            <p className="text-center text-gray-500 text-sm mt-3 ">
-              We understand {"you're"} an introvert, but {"you've"} got to start
-              somewhere 😊
-            </p>
-          </>
-        ) : (
-          // Chat List
-          conversations?.map((conversation) => (
-            <ConversationComponent
-              key={conversation?._id}
-              conversation={conversation}
-            />
-          ))
-        )}
-      </section>
+      <ConversationComponent />
     </aside>
   );
 };

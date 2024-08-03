@@ -1,4 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
 import { Video, X } from "lucide-react";
 import ChatPlaceHolder from "@/src/components/home/chat-placeholder";
 import MessageContainer from "@/src/components/home/message-container";
@@ -6,7 +10,7 @@ import MessageInput from "@/src/components/home/message-input";
 import GroupMembersDialog from "@/src/components/home/group-members-dialog";
 
 const RightPanel = () => {
-  const selectedConversation = true;
+  const selectedConversation = false;
   if (!selectedConversation) return <ChatPlaceHolder />;
 
   const conversationName = "John Doe";

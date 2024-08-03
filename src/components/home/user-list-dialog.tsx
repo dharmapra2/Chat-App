@@ -15,17 +15,10 @@ import {
   DialogClose,
 } from "@/src/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Id } from "@/convex/_generated/dataModel";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-
-interface ConversationParams {
-  participants: Id<"users">[];
-  isGroup: boolean;
-  groupName: string;
-  admin: Id<"users"> | undefined;
-  groupImage?: Id<"_storage">;
-}
+import { ConversationParams } from "@/src/types/interfaces";
+import { Id } from "@/convex/_generated/dataModel";
 
 const UserListDialogContent = () => {
   const [selectedUsers, setSelectedUsers] = useState<Id<"users">[]>([]);
