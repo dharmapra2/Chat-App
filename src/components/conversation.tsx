@@ -6,6 +6,7 @@ import {
 } from "@/src/components/ui/avatar";
 import { ImageIcon, Users, VideoIcon } from "lucide-react";
 import { MessageSeenSvg } from "@/src/components/ui/svgs";
+import { useConversationStore } from "@/src/store/chat-store";
 
 const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
   const conversationImage = conversation?.groupImage ?? conversation?.image;
@@ -13,10 +14,14 @@ const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
   const lastMessage = conversation?.lastMessage;
   const lastMessageType = lastMessage?.messageType;
 
+  const { setSelectedConversation, selectedConversation } =
+    useConversationStore();
+  const activeConversation = selectedConversation?._id === conversation?._id;
   return (
     <>
       <div
-        className={`flex gap-2 items-center p-3 hover:bg-chat-hover cursor-pointer `}
+        className={`flex gap-2 items-center p-3 hover:bg-chat-hover cursor-pointer ${activeConversation ? "bg-gray-tertiary" : ""}`}
+        onClick={() => setSelectedConversation(conversation)}
       >
         <Avatar className="border border-gray-900 overflow-visible relative">
           {conversation?.isOnline && (

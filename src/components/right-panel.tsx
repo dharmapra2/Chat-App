@@ -1,3 +1,4 @@
+"use client";
 import {
   Avatar,
   AvatarFallback,
@@ -8,13 +9,18 @@ import ChatPlaceHolder from "@/src/components/home/chat-placeholder";
 import MessageContainer from "@/src/components/home/message-container";
 import MessageInput from "@/src/components/home/message-input";
 import GroupMembersDialog from "@/src/components/home/group-members-dialog";
+import { useConversationStore } from "@/src/store/chat-store";
 
 const RightPanel = () => {
-  const selectedConversation = false;
+  const { selectedConversation, setSelectedConversation } =
+    useConversationStore();
   if (!selectedConversation) return <ChatPlaceHolder />;
 
-  const conversationName = "John Doe";
-  const isGroup = true;
+  const conversationName =
+    selectedConversation?.groupName || selectedConversation?.name;
+  const conversationImage =
+    selectedConversation?.groupImage || selectedConversation?.image;
+  const isGroup = selectedConversation?.isGroup || false;
 
   return (
     <div className="w-3/4 flex flex-col">
@@ -23,7 +29,11 @@ const RightPanel = () => {
         <div className="flex justify-between bg-gray-primary p-3">
           <div className="flex gap-3 items-center">
             <Avatar>
-              <AvatarImage src={"/placeholder.png"} className="object-cover" />
+              <AvatarImage
+                src={conversationImage || "/placeholder.png"}
+                className="object-cover"
+                fetchPriority="auto"
+              />
               <AvatarFallback>
                 <div className="animate-pulse bg-gray-tertiary w-full h-full rounded-full" />
               </AvatarFallback>
@@ -38,7 +48,11 @@ const RightPanel = () => {
             <a href="/video-call" target="_blank">
               <Video size={23} />
             </a>
-            <X size={16} className="cursor-pointer" />
+            <X
+              size={16}
+              className="cursor-pointer"
+              onClick={() => setSelectedConversation(null)}
+            />
           </div>
         </div>
       </div>

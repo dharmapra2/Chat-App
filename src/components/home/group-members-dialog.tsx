@@ -9,8 +9,16 @@ import {
 } from "@/src/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Crown } from "lucide-react";
+import { useConvexAuth, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const GroupMembersDialog = () => {
+  const { isAuthenticated } = useConvexAuth();
+
+  // const users = useQuery(
+  //   api.users.getGroupMembers,
+  //   isAuthenticated ? undefined : "skip"
+  // );
   return (
     <Dialog>
       <DialogTrigger>
