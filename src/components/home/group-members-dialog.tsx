@@ -1,4 +1,3 @@
-import { users } from "@/src/dummyData/db";
 import {
   Dialog,
   DialogContent,
@@ -11,14 +10,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Crown } from "lucide-react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { GroupMemeberDialogProps } from "@/src/types/interfaces";
 
-const GroupMembersDialog = () => {
+const GroupMembersDialog = ({
+  selectedConversation,
+}: GroupMemeberDialogProps) => {
   const { isAuthenticated } = useConvexAuth();
 
-  // const users = useQuery(
-  //   api.users.getGroupMembers,
-  //   isAuthenticated ? undefined : "skip"
-  // );
+  const me = useQuery(api.users.getMe, isAuthenticated ? undefined : "skip");
+
+  const users = useQuery(api.users.getGroupMembers, {
+    conversationId: selectedConversation._id,
+  });
   return (
     <Dialog>
       <DialogTrigger>
@@ -50,9 +53,11 @@ const GroupMembersDialog = () => {
                   <div className="w-full ">
                     <div className="flex items-center gap-2">
                       <h3 className="text-md font-medium">
-                        {user.name || user.email.split("@")[0]}
+                        {me?._id === user._id
+                          ? "You"
+                          : user.name || user.email.split("@")[0]}
                       </h3>
-                      {user.admin && (
+                      {user._id === selectedConversation.admin && (
                         <Crown size={16} className="text-yellow-400" />
                       )}
                     </div>

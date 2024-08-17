@@ -26,3 +26,6 @@ export type Conversations = {
     sender: Id<"users">;
   };
 };
+export type GroupMemeberDialogProps = {
+  selectedConversation: Conversations;
+};
