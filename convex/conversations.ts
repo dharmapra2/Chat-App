@@ -1,4 +1,3 @@
-import { conversations } from "./../src/dummyData/db";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
