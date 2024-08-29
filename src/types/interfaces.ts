@@ -1,3 +1,4 @@
+import { messages } from "@/src/dummyData/db";
 import { Id } from "@/convex/_generated/dataModel";
 
 export interface ConversationParams {
@@ -29,3 +30,24 @@ export type Conversations = {
 export type GroupMemeberDialogProps = {
   selectedConversation: Conversations;
 };
+
+export interface IMessage {
+  _id: Id<"messages">;
+  content: string;
+  _creationTime: number;
+  messageType: "text" | "image" | "video";
+  sender: {
+    _id: Id<"users">;
+    image: string;
+    name?: string;
+    tokenIdentifier: string;
+    email: string;
+    _creationTime: number;
+    isOnline: boolean;
+  };
+}
+
+export interface chatBubbleProps {
+  message: IMessage;
+  me: any;
+}

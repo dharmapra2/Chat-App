@@ -1,14 +1,25 @@
 import { Key } from "react";
 import ChatBubble from "@/src/components/home/chat-bubble";
-import { messages } from "@/src/dummyData/db";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useConversationStore } from "@/src/store/chat-store";
+// import { messages } from "@/src/dummyData/db";
 
 const MessageContainer = () => {
+  const { selectedConversation } = useConversationStore();
+
+  const messages = useQuery(api.messages.getMessages, {
+    conversation: selectedConversation!._id,
+  });
+  const me = useQuery(api.users.getMe);
+
+  console.log(messages);
   return (
     <div className="relative p-3 flex-1 overflow-auto h-full bg-chat-tile-light dark:bg-chat-tile-dark">
       <div className="mx-12 flex flex-col gap-3 h-full">
-        {messages?.map((msg: { _id: Key | null | undefined }, idx: any) => (
+        {messages?.map((msg, idx) => (
           <div key={msg._id}>
-            <ChatBubble />
+            <ChatBubble message={msg} me={me} />
           </div>
         ))}
       </div>
