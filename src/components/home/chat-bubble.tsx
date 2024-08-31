@@ -1,16 +1,16 @@
 import Image from "next/image";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+} from "@/src/components/ui/dialog";
 import { Bot } from "lucide-react";
-import { IMessage } from "@/src/types/interfaces";
+import { ChatBubbleProps, IMessage } from "@/src/types/interfaces";
 import { useConversationStore } from "@/src/store/chat-store";
-import { MessageSeenSvg } from "../ui/svgs";
-
-type ChatBubbleProps = {
-  message: IMessage;
-  me: any;
-  previousMessage?: IMessage;
-};
+import { MessageSeenSvg } from "@/src/components/ui/svgs";
+import ChatBubbleAvatar from "@/src/components/home/chat-bubble-avatar";
+import DateIndicator from "@/src/components/home/date-indicator";
 
 const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
   const date = new Date(message._creationTime);
@@ -51,14 +51,14 @@ const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
   if (!fromMe) {
     return (
       <>
-        {/* <DateIndicator message={message} previousMessage={previousMessage} /> */}
+        <DateIndicator message={message} previousMessage={previousMessage} />
         <div className="flex gap-1 w-2/3">
-          {/* <ChatBubbleAvatar
+          <ChatBubbleAvatar
             isGroup={isGroup}
             isMember={isMember}
             message={message}
             fromAI={fromAI}
-          /> */}
+          />
           <div
             className={`flex flex-col z-20 max-w-fit px-2 pt-1 rounded-md shadow-md relative ${bgClass}`}
           >
@@ -84,11 +84,11 @@ const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
 
   return (
     <>
-      {/* <DateIndicator message={message} previousMessage={previousMessage} /> */}
+      <DateIndicator message={message} previousMessage={previousMessage} />
 
       <div className="flex gap-1 w-2/3 ml-auto">
         <div
-          className={`flex  z-20 max-w-fit px-2 pt-1 rounded-md shadow-md ml-auto relative ${bgClass}`}
+          className={`flex z-20 max-w-fit px-2 pt-1 rounded-md shadow-md ml-auto relative ${bgClass}`}
         >
           <SelfMessageIndicator />
           {renderMessageContent()}

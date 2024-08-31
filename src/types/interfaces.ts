@@ -51,3 +51,14 @@ export interface chatBubbleProps {
   message: IMessage;
   me: any;
 }
+
+export interface DateIndicatorProps {
+  message: IMessage;
+  previousMessage?: IMessage;
+}
+
+export interface ChatBubbleProps {
+  message: IMessage;
+  me: any;
+  previousMessage?: IMessage;
+}
