@@ -11,6 +11,7 @@ import { useConversationStore } from "@/src/store/chat-store";
 import { MessageSeenSvg } from "@/src/components/ui/svgs";
 import ChatBubbleAvatar from "@/src/components/home/chat-bubble-avatar";
 import DateIndicator from "@/src/components/home/date-indicator";
+import ReactPlayer from "react-player";
 
 const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
   const date = new Date(message._creationTime);
@@ -109,14 +110,13 @@ export default ChatBubble;
 
 const VideoMessage = ({ message }: { message: IMessage }) => {
   return (
-    // <ReactPlayer
-    //   url={message.content}
-    //   width="250px"
-    //   height="250px"
-    //   controls={true}
-    //   light={true}
-    // />
-    <>videomsg</>
+    <ReactPlayer
+      url={message.content}
+      width="250px"
+      height="250px"
+      controls={true}
+      light={true}
+    />
   );
 };
 
@@ -134,6 +134,7 @@ const ImageMessage = ({
         fill
         className="cursor-pointer object-cover rounded"
         alt="image"
+        loading="lazy"
         onClick={handleClick}
       />
     </div>

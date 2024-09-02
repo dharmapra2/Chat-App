@@ -3,7 +3,6 @@ import ChatBubble from "@/src/components/home/chat-bubble";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useConversationStore } from "@/src/store/chat-store";
-// import { messages } from "@/src/dummyData/db";
 
 const MessageContainer = () => {
   const { selectedConversation } = useConversationStore();

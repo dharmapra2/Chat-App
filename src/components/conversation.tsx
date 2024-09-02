@@ -51,15 +51,25 @@ const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
             {lastMessage?.sender === me?._id ? <MessageSeenSvg /> : ""}
             {conversation?.isGroup && <Users size={16} />}
             {!lastMessage && "Say Hi!"}
-            {lastMessageType === "text" && lastMessage?.content.length > 30 ? (
+            {lastMessageType === "text" && lastMessage?.content.length > 30 && (
               <span className="text-xs">
                 {lastMessage?.content.slice(0, 30)}...
               </span>
-            ) : (
-              <span className="text-xs">{lastMessage?.content}</span>
             )}
-            {lastMessageType === "image" && <ImageIcon size={16} />}
-            {lastMessageType === "video" && <VideoIcon size={16} />}
+            <span className="text-xs flex gap-1 items-center">
+              {lastMessageType === "image" && (
+                <>
+                  <ImageIcon size={16} />
+                  <span>Photo</span>
+                </>
+              )}
+              {lastMessageType === "video" && (
+                <>
+                  <VideoIcon size={16} />
+                  <span>Video</span>
+                </>
+              )}
+            </span>
           </p>
         </div>
       </div>

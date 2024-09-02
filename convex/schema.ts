@@ -22,6 +22,8 @@ export default defineSchema({
     conversation: v.id("conversations"),
     sender: v.string(), // should be string so that it doesn't throw errors in openai part ("ChatGPT")
     content: v.string(),
+    // we stored the storageId so that in feature we can modify the file (user can edit the image)
+    storageId: v.optional(v.string()),
     messageType: v.union(
       v.literal("text"),
       v.literal("image"),
