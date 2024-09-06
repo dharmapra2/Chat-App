@@ -31,27 +31,27 @@ const GroupMembersDialog = ({
         <DialogHeader>
           <DialogTitle className="my-2">Current Members</DialogTitle>
           <DialogDescription>
-            <div className="flex flex-col gap-3 ">
+            <section className="flex flex-col gap-3 ">
               {users?.map((user) => (
-                <div
+                <section
                   key={user._id}
                   className={`flex gap-3 items-center p-2 rounded`}
                 >
                   <Avatar className="overflow-visible">
                     {user.isOnline && (
-                      <div className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 border-foreground" />
+                      <span className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 border-foreground" />
                     )}
                     <AvatarImage
                       src={user.image}
                       className="rounded-full object-cover"
                     />
                     <AvatarFallback>
-                      <div className="animate-pulse bg-gray-tertiary w-full h-full rounded-full"></div>
+                      <span className="animate-pulse bg-gray-tertiary w-full h-full rounded-full"></span>
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="w-full ">
-                    <div className="flex items-center gap-2">
+                  <section className="w-full ">
+                    <section className="flex items-center gap-2">
                       <h3 className="text-md font-medium">
                         {me?._id === user._id
                           ? "You"
@@ -60,11 +60,11 @@ const GroupMembersDialog = ({
                       {user._id === selectedConversation.admin && (
                         <Crown size={16} className="text-yellow-400" />
                       )}
-                    </div>
-                  </div>
-                </div>
+                    </section>
+                  </section>
+                </section>
               ))}
-            </div>
+            </section>
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

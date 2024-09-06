@@ -10,10 +10,13 @@ import MessageContainer from "@/src/components/home/message-container";
 import MessageInput from "@/src/components/home/message-input";
 import GroupMembersDialog from "@/src/components/home/group-members-dialog";
 import { useConversationStore } from "@/src/store/chat-store";
+import { useConvexAuth } from "convex/react";
 
 const RightPanel = () => {
   const { selectedConversation, setSelectedConversation } =
     useConversationStore();
+  const { isLoading } = useConvexAuth();
+  if (isLoading) return null;
   if (!selectedConversation) return <ChatPlaceHolder />;
 
   const conversationName =

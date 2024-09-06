@@ -1,20 +1,39 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { api } from "@/convex/_generated/api";
 import { useConvexAuth, useQuery } from "convex/react";
 import dynamic from "next/dynamic";
+import { useConversationStore } from "@/src/store/chat-store";
 
 const Conversation = dynamic(() => import("@/src/components/conversation"), {
   loading: () => <div> Conversation Loading...</div>,
 });
 
 function ParentConversation() {
-  const { isAuthenticated } = useConvexAuth();
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const me = useQuery(api.users.getMe, isAuthenticated ? undefined : "skip");
   const conversations = useQuery(
     api.conversations.getMyConversations,
     isAuthenticated ? undefined : "skip"
   );
+
+  const { selectedConversation, setSelectedConversation } =
+    useConversationStore();
+
+  useEffect(() => {
+    const conversationIds = conversations?.map(
+      (conversation) => conversation._id
+    );
+    if (
+      selectedConversation &&
+      conversationIds &&
+      !conversationIds.includes(selectedConversation._id)
+    ) {
+      setSelectedConversation(null);
+    }
+  }, [conversations, selectedConversation, setSelectedConversation]);
+
+  if (isLoading) return null;
 
   return (
     <section className="my-3 flex flex-col gap-0 max-h-[80%] overflow-auto">

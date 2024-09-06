@@ -19,7 +19,7 @@ const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
   const activeConversation = selectedConversation?._id === conversation?._id;
   return (
     <>
-      <div
+      <section
         className={`flex gap-2 items-center p-3 hover:bg-chat-hover cursor-pointer ${activeConversation ? "bg-gray-tertiary" : ""}`}
         onClick={() => setSelectedConversation(conversation)}
       >
@@ -36,8 +36,8 @@ const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
             <div className="animate-pulse bg-gray-tertiary w-full h-full rounded-full"></div>
           </AvatarFallback>
         </Avatar>
-        <div className="w-full">
-          <div className="flex items-center">
+        <aside className="w-full">
+          <section className="flex items-center">
             <h3 className="text-xs lg:text-sm font-medium">
               {conversationName}
             </h3>
@@ -46,7 +46,7 @@ const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
                 lastMessage?._creationTime || conversation?._creationTime
               )}
             </span>
-          </div>
+          </section>
           <p className="text-[12px] mt-1 text-gray-500 flex items-center gap-1 ">
             {lastMessage?.sender === me?._id ? <MessageSeenSvg /> : ""}
             {conversation?.isGroup && <Users size={16} />}
@@ -71,8 +71,8 @@ const Conversation = ({ conversation, me }: { conversation: any; me: any }) => {
               )}
             </span>
           </p>
-        </div>
-      </div>
+        </aside>
+      </section>
       <hr className="h-[1px] mx-10 bg-gray-primary" />
     </>
   );

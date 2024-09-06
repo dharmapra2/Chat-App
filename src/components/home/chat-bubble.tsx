@@ -12,6 +12,7 @@ import { MessageSeenSvg } from "@/src/components/ui/svgs";
 import ChatBubbleAvatar from "@/src/components/home/chat-bubble-avatar";
 import DateIndicator from "@/src/components/home/date-indicator";
 import ReactPlayer from "react-player";
+import ChatAvatarActions from "@/src/components/home/chat-avatar-actions";
 
 const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
   const date = new Date(message._creationTime);
@@ -53,21 +54,21 @@ const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
     return (
       <>
         <DateIndicator message={message} previousMessage={previousMessage} />
-        <div className="flex gap-1 w-2/3">
+        <main className="flex gap-1 w-2/3">
           <ChatBubbleAvatar
             isGroup={isGroup}
             isMember={isMember}
             message={message}
             fromAI={fromAI}
           />
-          <div
+          <section
             className={`flex flex-col z-20 max-w-fit px-2 pt-1 rounded-md shadow-md relative ${bgClass}`}
           >
             {!fromAI && <OtherMessageIndicator />}
             {fromAI && (
               <Bot size={16} className="absolute bottom-[2px] left-2" />
             )}
-            {/* {<ChatAvatarActions message={message} me={me} />} */}
+            {<ChatAvatarActions message={message} me={me} />}
             {renderMessageContent()}
             {open && (
               <ImageDialog
@@ -77,8 +78,8 @@ const ChatBubble = ({ me, message, previousMessage }: ChatBubbleProps) => {
               />
             )}
             <MessageTime time={time} fromMe={fromMe} />
-          </div>
-        </div>
+          </section>
+        </main>
       </>
     );
   }
