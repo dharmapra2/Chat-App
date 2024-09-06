@@ -19,6 +19,7 @@ import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { ConversationParams } from "@/src/types/interfaces";
 import { Id } from "@/convex/_generated/dataModel";
+import { useConversationStore } from "@/src/store/chat-store";
 
 const UserListDialogContent = () => {
   const [selectedUsers, setSelectedUsers] = useState<Id<"users">[]>([]);
@@ -27,6 +28,7 @@ const UserListDialogContent = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [renderedImage, setRenderedImage] = useState("");
 
+  const { setSelectedConversation } = useConversationStore();
   const imgRef = useRef<HTMLInputElement>(null);
   const dialogCloseRef = useRef<HTMLButtonElement>(null);
 
@@ -44,26 +46,41 @@ const UserListDialogContent = () => {
 
   const handleCreateConversations = async () => {
     if (selectedUsers.length === 0) return;
+
+    const handleStatusToast = (status: string, message: string) => {
+      status !== "exits" ? toast.success(message) : toast.error(message);
+    };
+
+    const clearForm = () => {
+      dialogCloseRef.current?.click();
+      setSelectedUsers([]);
+      setGroupName("");
+      setSelectedImage(null);
+    };
+
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const isGroup = selectedUsers.length > 1;
+      let tempConversationId;
+      const participants = [...selectedUsers, me?._id!].sort();
+
       if (!isGroup) {
         const { ConversationId, messages, status } = await createConversation({
-          participants: [...selectedUsers, me?._id!],
+          participants,
           isGroup: false,
         });
-        status != "exits" ? toast.success(messages) : toast.error(messages);
+        handleStatusToast(status, messages);
+        tempConversationId = ConversationId;
       } else {
-        let temp_storageId: ConversationParams = {
-          participants: [...selectedUsers, me?._id!].sort(),
+        const temp_storageId: ConversationParams = {
+          participants,
           isGroup: true,
           groupName,
-          admin: me?._id,
+          admin: me?._id!,
         };
+
         if (selectedImage) {
-          // Step 1: Get a short-lived upload URL
           const postUrl = await generateUploadUrl();
-          // Step 2: POST the file to the URL
           const result = await fetch(postUrl, {
             method: "POST",
             headers: { "Content-Type": selectedImage!.type },
@@ -72,16 +89,29 @@ const UserListDialogContent = () => {
           const { storageId } = await result.json();
           temp_storageId.groupImage = storageId as Id<"_storage">;
         }
+
         const { ConversationId, messages, status } =
           await createConversation(temp_storageId);
-        status != "exits" ? toast.success(messages) : toast.error(messages);
+        handleStatusToast(status, messages);
+        tempConversationId = ConversationId;
       }
-      dialogCloseRef.current?.click();
-      setSelectedUsers([]);
-      setGroupName("");
-      setSelectedImage(null);
 
-      // TODO: update the global state called `selectedConversations`.
+      clearForm();
+
+      const conversationName = isGroup
+        ? groupName
+        : users?.find((user) => user._id === selectedUsers[0])?.name;
+
+      setSelectedConversation({
+        _id: tempConversationId,
+        participants: selectedUsers,
+        isGroup,
+        image: isGroup
+          ? renderedImage
+          : users?.find((user) => user._id === selectedUsers[0])?.image,
+        name: conversationName,
+        admin: me?._id!,
+      });
     } catch (error) {
       console.error(`Error: ${error}`);
       toast.error("Failed to create conversations.");

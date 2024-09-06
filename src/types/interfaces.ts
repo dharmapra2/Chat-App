@@ -18,9 +18,9 @@ export type Conversations = {
   admin?: Id<"users">;
   groupName?: string;
   groupImage?: string;
-  isOnline: boolean;
-  _creationTime: number;
-  lastMessage: {
+  isOnline?: boolean;
+  _creationTime?: number;
+  lastMessage?: {
     _id: Id<"messages">;
     conversation: Id<"conversations">;
     content: string;
