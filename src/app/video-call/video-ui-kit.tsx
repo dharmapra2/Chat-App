@@ -1,8 +1,10 @@
+"use client";
+
 import { randomID } from "@/src/lib/utils";
 import { useClerk } from "@clerk/nextjs";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation"; // Correct import for useRouter in app directory
 
 // Utility function to parse URL params
 export function getUrlParams(url: string): URLSearchParams {
@@ -65,6 +67,11 @@ export default function VideoUIKit() {
               roomID,
           },
         ],
+        showPreJoinView: false,
+        showTextChat: false,
+        showUserList: false,
+        showOnlyAudioUser: true,
+        enableUserSearch: false,
         scenario: {
           mode: ZegoUIKitPrebuilt.GroupCall, // Group call mode
         },
@@ -74,21 +81,21 @@ export default function VideoUIKit() {
     }
   };
 
-  // useEffect(() => {
-  //   if (!router || !user?.id) return;
+  useEffect(() => {
+    if (!router || !user?.id) return;
 
-  //   setIsMounted(true);
+    setIsMounted(true);
 
-  //   // Call the meeting logic after the component is mounted and ref is ready
-  //   if (meetingContainerRef.current) {
-  //     myMeeting(meetingContainerRef.current);
-  //   }
-  // }, [router, user?.id]); // Wait for router and user to be ready
+    // Call the meeting logic after the component is mounted and ref is ready
+    if (meetingContainerRef.current) {
+      myMeeting(meetingContainerRef.current);
+    }
+  }, [router, user?.id]); // Wait for router and user to be ready
 
   return isMounted ? (
     <div
       className="myCallContainer"
-      ref={myMeeting()} // Set the ref here
+      ref={meetingContainerRef} // Set the ref here
       style={{ width: "100vw", height: "100vh" }}
     ></div>
   ) : (
